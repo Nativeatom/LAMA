@@ -7,6 +7,7 @@
 import torch
 import numpy as np
 import scipy
+import pdb
 
 
 def __max_probs_values_indices(masked_indices, log_probs, topk=1000):
@@ -45,19 +46,15 @@ def __print_top_k(value_max_probs, index_max_probs, vocab, mask_topk, index_list
                 i,
                 word_form,
                 log_prob
-            )     
+            )
+        if ans_rank is not None:
+            msg += "{:<8d}{:<20s}{:<12.3f}\n".format(
+                ans_rank,
+                vocab[ans_ids],
+                value_max_probs[ans_rank].item()
+            )            
         element = {'i' : i, 'token_idx': idx, 'log_prob': log_prob, 'token_word_form': word_form}
         result.append(element)
-    if ans_rank is not None:
-        ans_log_prob = value_max_probs[ans_rank].item()
-        ans_word_form = vocab[ans_ids]
-        msg += "{:<8d}{:<20s}{:<12.3f}\n".format(
-            ans_rank,
-            ans_word_form,
-            ans_log_prob
-        )    
-        element = {'i' : ans_rank, 'token_idx': ans_ids, 'log_prob': ans_log_prob, 'token_word_form': ans_word_form}
-        result.append(element)   
     return result, msg
 
 

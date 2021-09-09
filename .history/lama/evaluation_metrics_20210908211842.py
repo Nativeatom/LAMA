@@ -7,6 +7,7 @@
 import torch
 import numpy as np
 import scipy
+import pdb
 
 
 def __max_probs_values_indices(masked_indices, log_probs, topk=1000):
@@ -45,19 +46,15 @@ def __print_top_k(value_max_probs, index_max_probs, vocab, mask_topk, index_list
                 i,
                 word_form,
                 log_prob
-            )     
+            )
+        if ans_rank is not None:
+            msg += "{:<8d}{:<20s}{:<12.3f}\n".format(
+                ans_rank,
+                vocab[ans_ids],
+                value_max_probs[ans_rank].item()
+            )            
         element = {'i' : i, 'token_idx': idx, 'log_prob': log_prob, 'token_word_form': word_form}
         result.append(element)
-    if ans_rank is not None:
-        ans_log_prob = value_max_probs[ans_rank].item()
-        ans_word_form = vocab[ans_ids]
-        msg += "{:<8d}{:<20s}{:<12.3f}\n".format(
-            ans_rank,
-            ans_word_form,
-            ans_log_prob
-        )    
-        element = {'i' : ans_rank, 'token_idx': ans_ids, 'log_prob': ans_log_prob, 'token_word_form': ans_word_form}
-        result.append(element)   
     return result, msg
 
 
@@ -69,10 +66,10 @@ def get_ranking(log_probs, masked_indices, vocab, label_index = None, index_list
     log_probs, index_max_probs, value_max_probs = __max_probs_values_indices(masked_indices, log_probs, topk=topk)
     if ans_ids is not None:
         if ans_ids[0] in index_max_probs:
-            ans_rank = index_max_probs.tolist().index(ans_ids[0])
+            ans_rank = index_max_probs.index(ans_ids[0])
         else:
-            print("ans {} is not in top {} predictions".format(vocab[ans_ids[0]], topk))
-    result_masked_topk, return_msg = __print_top_k(value_max_probs, index_max_probs, vocab, topk, index_list, ans_ids=ans_ids[0], ans_rank=ans_rank)
+            print("ans {} is not in top {} predictions".format(vocab[ans_rank], topk))
+    result_masked_topk, return_msg = __print_top_k(value_max_probs, index_max_probs, vocab, topk, index_list, ans_ids=ans_ids, ans_rank=ans_rank)
     experiment_result['topk'] = result_masked_topk
 
     if print_generation:

@@ -64,14 +64,14 @@ def get_eval_generation_parser():
     )
     # Added
     parser.add_argument(
-        "--ans",
+        "--answer", "--ans",
         dest="text",
-        help="provide the answer"
+        help="provide the answer",
     )
     parser.add_argument(
         "--range",
         dest="int",
-        help="range of answers"
+        help="range of answers",
     )
     return parser
 
@@ -236,6 +236,7 @@ def __add_elmo_args(parser):
 def parse_args(parser):
     args = parser.parse_args()
     args.models_names = [x.strip().lower() for x in args.models.split(",")]
+    pdb.set_trace()
     if "fconv" in args.models_names:
         if args.data is None:
             raise ValueError(

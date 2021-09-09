@@ -7,6 +7,7 @@
 import torch
 import numpy as np
 import scipy
+import pdb
 
 
 def __max_probs_values_indices(masked_indices, log_probs, topk=1000):
@@ -56,8 +57,8 @@ def __print_top_k(value_max_probs, index_max_probs, vocab, mask_topk, index_list
             ans_word_form,
             ans_log_prob
         )    
-        element = {'i' : ans_rank, 'token_idx': ans_ids, 'log_prob': ans_log_prob, 'token_word_form': ans_word_form}
-        result.append(element)   
+    element = {'i' : ans_rank, 'token_idx': ans_ids, 'log_prob': ans_log_prob, 'token_word_form': ans_word_form}
+    result.append(element)   
     return result, msg
 
 

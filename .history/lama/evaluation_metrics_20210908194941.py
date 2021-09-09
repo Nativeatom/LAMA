@@ -7,6 +7,7 @@
 import torch
 import numpy as np
 import scipy
+import pdb
 
 
 def __max_probs_values_indices(masked_indices, log_probs, topk=1000):
@@ -24,7 +25,7 @@ def __max_probs_values_indices(masked_indices, log_probs, topk=1000):
     return log_probs, index_max_probs, value_max_probs
 
 
-def __print_top_k(value_max_probs, index_max_probs, vocab, mask_topk, index_list, max_printouts = 10, ans_ids=None, ans_rank=None):
+def __print_top_k(value_max_probs, index_max_probs, vocab, mask_topk, index_list, max_printouts = 10):
     result = []
     msg = "\n| Top{} predictions\n".format(max_printouts)
     for i in range(mask_topk):
@@ -45,34 +46,18 @@ def __print_top_k(value_max_probs, index_max_probs, vocab, mask_topk, index_list
                 i,
                 word_form,
                 log_prob
-            )     
+            )
         element = {'i' : i, 'token_idx': idx, 'log_prob': log_prob, 'token_word_form': word_form}
         result.append(element)
-    if ans_rank is not None:
-        ans_log_prob = value_max_probs[ans_rank].item()
-        ans_word_form = vocab[ans_ids]
-        msg += "{:<8d}{:<20s}{:<12.3f}\n".format(
-            ans_rank,
-            ans_word_form,
-            ans_log_prob
-        )    
-        element = {'i' : ans_rank, 'token_idx': ans_ids, 'log_prob': ans_log_prob, 'token_word_form': ans_word_form}
-        result.append(element)   
     return result, msg
 
 
-def get_ranking(log_probs, masked_indices, vocab, label_index = None, index_list = None, topk = 1000, P_AT = 10, ans_ids=None, print_generation=True):
+def get_ranking(log_probs, masked_indices, vocab, label_index = None, index_list = None, topk = 1000, P_AT = 10, ans=None, print_generation=True):
 
     experiment_result = {}
-    ans_rank = None
 
     log_probs, index_max_probs, value_max_probs = __max_probs_values_indices(masked_indices, log_probs, topk=topk)
-    if ans_ids is not None:
-        if ans_ids[0] in index_max_probs:
-            ans_rank = index_max_probs.tolist().index(ans_ids[0])
-        else:
-            print("ans {} is not in top {} predictions".format(vocab[ans_ids[0]], topk))
-    result_masked_topk, return_msg = __print_top_k(value_max_probs, index_max_probs, vocab, topk, index_list, ans_ids=ans_ids[0], ans_rank=ans_rank)
+    result_masked_topk, return_msg = __print_top_k(value_max_probs, index_max_probs, vocab, topk, index_list)
     experiment_result['topk'] = result_masked_topk
 
     if print_generation:
@@ -91,6 +76,7 @@ def get_ranking(log_probs, masked_indices, vocab, label_index = None, index_list
 
         query = torch.full(value_max_probs.shape, label_index, dtype=torch.long).numpy().astype(int)
         ranking_position = (index_max_probs==query).nonzero()
+        pdb.set_trace()
 
         # LABEL PERPLEXITY
         tokens = torch.from_numpy(np.asarray(label_index))

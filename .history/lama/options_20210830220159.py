@@ -5,7 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 import argparse
-import pdb
+
 
 def get_general_parser():
     parser = argparse.ArgumentParser()
@@ -61,17 +61,6 @@ def get_eval_generation_parser():
         dest="split_sentence",
         action="store_true",
         help="split the input text in sentences",
-    )
-    # Added
-    parser.add_argument(
-        "--ans",
-        dest="text",
-        help="provide the answer"
-    )
-    parser.add_argument(
-        "--range",
-        dest="int",
-        help="range of answers"
     )
     return parser
 
